@@ -4,28 +4,31 @@ import java.security.MessageDigest;
 import java.util.Date;
 
 public class Block {
+    private final String miner;
     private final long id;
     private final long timestamp;
     private long magicNumber = 0;
     private final String prevHash;
     private final String hash;
+    private final long generationTime;
 
     public Block(long id, String prevHash, StringBuilder prefix) {
+        this.miner = Thread.currentThread().getName();
         this.id = id;
         this.prevHash = prevHash;
         this.timestamp = new Date().getTime();
 
         String hashFound;
         do {
+            magicNumber = (long) (Math.random() * Long.MAX_VALUE);
             hashFound = generateHash("" + id + timestamp + magicNumber + prevHash);
-            magicNumber++;
 //            System.out.print(hashFound.substring(0, 8) + ", ");
         }
         while(!hashFound.startsWith(String.valueOf(prefix)));
         this.hash = hashFound;
-        System.out.print(this);
-        long timeDifference = new Date().getTime() - timestamp;
-        System.out.println("Block was generating for " + timeDifference + " milliseconds\n");
+//        System.out.print(this);
+        generationTime = new Date().getTime() - timestamp;
+//        System.out.println("Temp: " + generationTime);
     }
 
     public long getId() {
@@ -42,6 +45,10 @@ public class Block {
 
     public String getHash() {
         return hash;
+    }
+
+    public long getGenerationTime() {
+        return generationTime;
     }
 
     private String generateHash(String input) {
@@ -65,10 +72,12 @@ public class Block {
     @Override
     public String toString() {
         return "Block: \n" +
+                "Created by: " + miner + "\n" +
                 "Id: " + id + "\n" +
                 "Timestamp: " + timestamp + "\n" +
                 "Magic number: " + magicNumber + "\n" +
                 "Hash of the previous block: \n" + prevHash + "\n" +
-                "Hash of the block: \n" + hash + "\n";
+                "Hash of the block: \n" + hash + "\n" +
+                "Block was generating for " + generationTime + " milliseconds\n";
     }
 }
